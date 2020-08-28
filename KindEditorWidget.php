@@ -22,10 +22,7 @@ class KindEditorWidget extends InputWidget
     const THEME_TYPE_QQ = 'qq';
     const THEME_TYPE_SIMPLE = 'simple';
 
-    const LANG_TYPE_AR = 'ar';
     const LANG_TYPE_EN = 'en';
-    const LANG_TYPE_KO = 'ko';
-    const LANG_TYPE_RU = 'ru';
     const LANG_TYPE_ZH_CN = 'zh-CN';
     const LANG_TYPE_ZH_TW = 'zh-TW';
 
@@ -58,7 +55,7 @@ class KindEditorWidget extends InputWidget
         $asset = KindEditorAsset::register($view);
         $themeType = !empty($this->clientOptions['themeType']) ? $this->clientOptions['themeType'] : self::THEME_TYPE_DEFAULT;
         if ($themeType != self::THEME_TYPE_DEFAULT) {
-            $view->registerCssFile($asset->baseUrl . "/themes/{$themeType}/{$themeType}.css", ['depends' => 'cliff363825\kindeditor\KindEditorAsset']);
+            $view->registerCssFile($asset->baseUrl . "/themes/{$themeType}/{$themeType}.css");
         }
         $preJs = '';
         if ($themeType == self::THEME_TYPE_QQ) {
@@ -147,7 +144,9 @@ K.each({
                 'link',
             ];
         }
-        $view->registerJsFile($asset->baseUrl . '/lang/' . $this->clientOptions['langType'] . '.js', ['depends' => 'cliff363825\kindeditor\KindEditorAsset']);
+        if($this->clientOptions['langType'] != self::LANG_TYPE_ZH_CN) {
+            $view->registerJsFile($asset->baseUrl . '/lang/' . $this->clientOptions['langType'] . '.js');
+        }
         $id = $this->options['id'];
         $varName = self::PLUGIN_NAME . '_' . str_replace('-', '_', $id);
         $js = "
@@ -155,7 +154,7 @@ KindEditor.ready(function(K) {
     {$preJs};
     var {$varName} = K.create('#{$id}'," . Json::encode($this->clientOptions) . ");});
 ";
-        $view->registerJs($js);
+        $view->registerJs($js, yii\web\View::POS_END);
     }
 
     /**
@@ -178,7 +177,7 @@ KindEditor.ready(function(K) {
     protected function defaultOptions()
     {
         return [
-            'width' => '680px',
+            'width' => '100%',
             'height' => '350px',
             'themeType' => self::THEME_TYPE_DEFAULT,
             'langType' => self::LANG_TYPE_ZH_CN,
